@@ -55,7 +55,9 @@
             "Usar catálogos para límites organizacionales y schemas para dominios o productos.",
             "Nombrar tablas administradas, externas y volúmenes."
           ],
-          "features": ["Metastore", "Catalogs", "Schemas", "Tables", "Views", "Volumes", "Models"]
+          "features": ["Metastore", "Catalogs", "Schemas", "Tables", "Views", "Volumes", "Models"],
+          "geniePrompt": "Actúa como arquitecto de datos. Inspecciona el catálogo `diners_governance` y genera un mapa en Markdown con: catalogs/schemas, tablas, vistas, funciones y volúmenes; owner y comentario de cada objeto; y una explicación de qué se gobierna en cada nivel del namespace de Unity Catalog. Usa SHOW, DESCRIBE y `information_schema`. No modifiques ningún objeto.",
+          "genieExpected": "Mapa técnico del catálogo y explicación del namespace, sin cambios sobre el ambiente."
         }
       ]
     },
@@ -80,7 +82,9 @@
             "Curator: organiza dominios, Pages, certificaciones, comentarios y recomendaciones.",
             "Administrador: identidad, GRANT/ABAC, tag policies, masks, storage y auditoría."
           ],
-          "features": ["Consumer", "Curator", "Administrator", "Delegation", "Least privilege"]
+          "features": ["Consumer", "Curator", "Administrator", "Delegation", "Least privilege"],
+          "geniePrompt": "Usando los objetos de `diners_governance`, prepara una matriz RACI para tres personas: consumidor de Fraude, curator/steward del dominio Tarjetas y administrador de Unity Catalog. Incluye: descubrir, solicitar acceso, consultar, documentar, asignar a Domain, certificar/deprecar, aplicar governed tags, crear GRANT/ABAC/masks y auditar. Indica qué privilegio necesita cada acción y separa claramente `MANAGE DISCOVERY` de los privilegios sobre datos.",
+          "genieExpected": "RACI que diferencia consumo, curación y administración, con privilegios asociados."
         },
         {
           "id": "modelo-2",
@@ -99,6 +103,8 @@
             "Abrir el mismo activo en Catalog Explorer: properties, permissions, sample data y lineage."
           ],
           "features": ["Discover page", "Domains", "Pages", "Genie One", "Search", "Catalog Explorer", "AI recommendations"],
+          "geniePrompt": "Analiza los metadatos de `diners_governance.tarjetas` y recomienda qué activos publicarías en el Domain de Discover `Tarjetas y Fraude`. Para cada candidato incluye nombre, descripción para negocio, owner sugerido, nivel de confianza, tags relevantes y razón para certificarlo o no. Usa comentarios, tags, lineage e información de columnas. No ejecutes DDL.",
+          "genieExpected": "Propuesta de curación para Discover con `transacciones_riesgo` y `fraud_kpis` como candidatos principales.",
           "links": [
             {
               "label": "Discover data",
@@ -125,7 +131,9 @@
             "Conectar governed tags, comentarios y owners con búsqueda.",
             "Definir dos dominios piloto: Tarjetas/Fraude y Cobranzas/Crédito."
           ],
-          "features": ["MANAGE DISCOVERY", "Certification", "Deprecation", "Governed tags", "Comments", "Ownership"]
+          "features": ["MANAGE DISCOVERY", "Certification", "Deprecation", "Governed tags", "Comments", "Ownership"],
+          "geniePrompt": "Genera un checklist de curación para publicar `diners_governance.tarjetas.transacciones_riesgo` en Discover. Debe cubrir Domain/subdomain, owner técnico y de negocio, descripción, Page/glosario, governed tags, certificación o deprecación, revisión de lineage, calidad mínima y periodicidad de revisión. Señala qué realiza el curator y qué debe delegar el administrador.",
+          "genieExpected": "Checklist accionable de publicación y mantenimiento del activo en Discover."
         }
       ]
     },
@@ -150,7 +158,9 @@
             "Asset certificado, owner, descripción y Page asociada.",
             "Mostrar popularidad o Insights si está disponible."
           ],
-          "features": ["Discover", "Domains", "Search", "Certification", "Insights"]
+          "features": ["Discover", "Domains", "Search", "Certification", "Insights"],
+          "geniePrompt": "Encuentra el activo más confiable en `diners_governance` para analizar fraude en transacciones. Compara tablas y vistas por comentarios, tags, dependencias y granularidad. Recomienda un solo activo para consumidores y genera cinco preguntas de negocio que Genie One podría responder sin exponer PII.",
+          "genieExpected": "Selección razonada de `transacciones_riesgo` y preguntas agregadas seguras."
         },
         {
           "id": "demo-2",
@@ -162,11 +172,13 @@
           "keyMessage": "Los governed tags convierten una taxonomía acordada en metadatos consistentes y utilizables por políticas.",
           "talkTrack": "PAN y email no dependen de que cada equipo escriba 'confidencial' de una forma distinta.",
           "actions": [
-            "Mostrar tags: dominio=tarjetas, sensibilidad=confidencial, pii=true.",
+            "Mostrar tags: domain=risk_fraud, sensitivity=HIGH, contains_pii=true.",
             "Explicar valores permitidos de governed tags.",
             "Mostrar clasificación de datos sensibles cuando esté habilitada."
           ],
-          "features": ["Governed tags", "Data classification", "PII", "Catalog Explorer"]
+          "features": ["Governed tags", "Data classification", "PII", "Catalog Explorer"],
+          "geniePrompt": "Perfila las columnas de `diners_governance.tarjetas.transacciones_tarjeta` y clasifícalas como PII, dato financiero sensible o no sensible. Compara tu resultado con `information_schema.column_tags`. Genera los comandos `ALTER COLUMN ... SET TAGS` que faltarían, pero no los ejecutes. Respeta los valores permitidos del sandbox: `pii_type` = name, email, phone u other; `sensitivity` = HIGH, MEDIUM o LOW.",
+          "genieExpected": "Inventario de sensibilidad y SQL propuesto, sin ejecutar cambios."
         },
         {
           "id": "demo-3",
@@ -183,7 +195,9 @@
             "Mostrar una política ABAC basada en sensibilidad y dominio.",
             "Recordar que los grupos deben provenir del IdP mediante SCIM."
           ],
-          "features": ["RBAC", "ABAC", "Groups", "Privilege inheritance", "SCIM"]
+          "features": ["RBAC", "ABAC", "Groups", "Privilege inheritance", "SCIM"],
+          "geniePrompt": "Diseña el acceso de mínimo privilegio para `diners_governance`: grupos `fraud_analysts`, `data_curators` y `auditors`. Genera GRANTs jerárquicos y una propuesta ABAC que use los governed tags `domain` y `sensitivity`. Explica cómo evitar grants usuario-a-usuario y cómo SCIM mantiene los grupos. Devuelve SQL y pseudopolítica para revisión; no ejecutes nada.",
+          "genieExpected": "GRANTs por grupo, propuesta ABAC y explicación de identidad/SCIM."
         },
         {
           "id": "demo-4",
@@ -200,7 +214,9 @@
             "Ejecutar la misma consulta para las dos personas.",
             "Conectar la política con Genie y dashboards."
           ],
-          "features": ["Column masks", "Row filters", "Dynamic views", "Need to know"]
+          "features": ["Column masks", "Row filters", "Dynamic views", "Need to know"],
+          "geniePrompt": "Revisa las funciones y políticas aplicadas a `diners_governance.tarjetas.transacciones_tarjeta`. Explica qué verá un miembro de `admins` y qué verá un usuario de `users`. Luego genera: (1) una query de validación para PAN/email, (2) una query para verificar el row filter por país y (3) pruebas negativas. No reemplaces las funciones existentes.",
+          "genieExpected": "Plan de prueba de masks y row filter con resultados esperados por persona."
         },
         {
           "id": "demo-5",
@@ -216,7 +232,9 @@
             "Mostrar notebooks, jobs o dashboards conectados.",
             "Mencionar external lineage para movimientos fuera de Databricks."
           ],
-          "features": ["Table lineage", "Column lineage", "Impact analysis", "External lineage"]
+          "features": ["Table lineage", "Column lineage", "Impact analysis", "External lineage"],
+          "geniePrompt": "Genera consultas sobre `system.access.table_lineage` y `system.access.column_lineage` para reconstruir el flujo desde `clientes`, `comercios` y `transacciones_tarjeta` hasta `transacciones_riesgo` y `fraud_kpis` durante los últimos 7 días. Incluye una consulta de impacto: qué downstreams dependen de `fraud_score`. Filtra siempre por fecha.",
+          "genieExpected": "Queries de lineage e impacto listas para ejecutar y abrir en Catalog Explorer."
         },
         {
           "id": "demo-6",
@@ -232,7 +250,9 @@
             "Nombrar Metric Views como métricas gobernadas.",
             "Conectar Pages con el contexto que usa Genie One."
           ],
-          "features": ["Data quality monitoring", "Metric Views", "Pages", "Business semantics"]
+          "features": ["Data quality monitoring", "Metric Views", "Pages", "Business semantics"],
+          "geniePrompt": "Usa `diners_governance.governance.dq_results` y `diners_governance.tarjetas.fraud_kpis` para crear un scorecard de confianza. Incluye checks PASS/WARN, tasa de marcación por país/categoría y tres reglas de anomalía sugeridas. Después propone la definición de una Metric View para `flagged_rate`; si no conoces la sintaxis exacta, indícalo y genera primero la especificación de negocio.",
+          "genieExpected": "Scorecard, reglas de anomalía y especificación gobernada del KPI."
         },
         {
           "id": "demo-7",
@@ -248,7 +268,9 @@
             "Mostrar eventos de SELECT y GRANT/REVOKE disponibles.",
             "Explicar retención, acceso restringido y alertas."
           ],
-          "features": ["System tables", "Audit logs", "Access events", "Permission changes"]
+          "features": ["System tables", "Audit logs", "Access events", "Permission changes"],
+          "geniePrompt": "Genera consultas seguras sobre `system.access.audit` para los últimos 7 días que respondan: quién consultó objetos `diners_governance`, quién cambió permisos o tags y qué acciones fallaron. Incluye `event_date` en todos los filtros, evita seleccionar datos sensibles innecesarios y agrega una propuesta de alerta para accesos inusuales.",
+          "genieExpected": "Tres queries de auditoría y una regla de alerta con filtros temporales."
         },
         {
           "id": "demo-8",
@@ -266,7 +288,9 @@
             "Iceberg interoperability: motores externos sobre catálogo abierto.",
             "AI governance: modelos, funciones, agentes y AI Gateway."
           ],
-          "features": ["Volumes", "Federation", "Delta Sharing", "Clean Rooms", "Iceberg", "AI governance"]
+          "features": ["Volumes", "Federation", "Delta Sharing", "Clean Rooms", "Iceberg", "AI governance"],
+          "geniePrompt": "Diseña una matriz de decisión para Diners que compare: Lakehouse Federation, ingestión a Delta/Iceberg, Delta Sharing y Clean Rooms. Usa criterios de latencia, copia de datos, control de acceso, lineage, costo y colaboración externa. Incluye cómo gobernar documentos en Volumes y activos de IA. No asumas que Teradata se elimina.",
+          "genieExpected": "Matriz de arquitectura que conserva coexistencia y explica cuándo usar cada patrón."
         }
       ]
     },
@@ -308,7 +332,9 @@
             "Identificar grupos consumidores y aprobadores.",
             "Asignar administración de metastore, identidad y policies."
           ],
-          "features": ["Ownership", "Data stewardship", "Separation of duties", "MANAGE DISCOVERY"]
+          "features": ["Ownership", "Data stewardship", "Separation of duties", "MANAGE DISCOVERY"],
+          "geniePrompt": "Convierte las decisiones de esta conversación en una matriz RACI para los dominios `Tarjetas/Fraude` y `Cobranzas/Crédito`. Roles: business owner, data curator, platform admin, security, auditor y consumidor. Acciones: publicar en Discover, aprobar acceso, certificar, mantener Pages, definir tags, operar calidad y revisar audit. Marca cualquier responsabilidad que todavía necesite un nombre real.",
+          "genieExpected": "RACI listo para completar con nombres de Diners durante la sesión."
         },
         {
           "id": "diners-3",
@@ -325,7 +351,9 @@
             "Definir una mask, un row filter y una política ABAC.",
             "Definir criterio de éxito: tiempo para encontrar, acceso aprobado y evidencia generada."
           ],
-          "features": ["Pilot", "Taxonomy", "Policy design", "Success metrics"]
+          "features": ["Pilot", "Taxonomy", "Policy design", "Success metrics"],
+          "geniePrompt": "Genera un plan de piloto de 4 semanas para Unity Catalog en Diners con dos dominios: Tarjetas/Fraude y Cobranzas/Crédito. Incluye por semana: entregables, responsables, prerrequisitos, 3–5 activos, governed tags, una mask, un row filter, una política ABAC, publicación en Discover, métricas de adopción y evidencia de audit. Separa must-have de opcional.",
+          "genieExpected": "Plan de cuatro semanas con alcance, owners, controles y criterios de éxito."
         }
       ]
     },
@@ -367,7 +395,9 @@
             "Solicitar mapa de grupos e inventario de 3–5 activos.",
             "Agendar lab técnico y revisión de arquitectura."
           ],
-          "features": ["Next steps", "Owners", "Assessment", "Hands-on lab"]
+          "features": ["Next steps", "Owners", "Assessment", "Hands-on lab"],
+          "geniePrompt": "Redacta el resumen ejecutivo y los próximos pasos de este workshop. Estructura: objetivo, capacidades demostradas, decisiones tomadas, decisiones pendientes, dos dominios piloto, responsables, riesgos, información requerida y agenda del siguiente lab de 90 minutos. No inventes nombres ni acuerdos: usa `POR CONFIRMAR` cuando falte información.",
+          "genieExpected": "Minuta ejecutiva reutilizable sin inventar decisiones ni responsables."
         }
       ]
     }

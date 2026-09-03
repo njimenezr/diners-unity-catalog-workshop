@@ -9,6 +9,8 @@ Workshop interactivo de 90 minutos para presentar gobierno de datos con Unity Ca
 - Clasificación, certificación, lineage, calidad y auditoría.
 - Federation, Delta Sharing, Clean Rooms, Iceberg y gobierno de IA.
 - Coexistencia gradual entre Teradata y Databricks.
+- Patrón didáctico en cada paso: conversación → explicación → Genie Code.
+- 15 prompts copiables para que los participantes consulten, diseñen o validen.
 
 Los datos y nombres usados en la demo son sintéticos.
 
@@ -25,6 +27,8 @@ Los datos y nombres usados en la demo son sintéticos.
 │   └── workshop.json
 ├── frontend/
 │   └── index.html
+├── notebooks/
+│   └── 00_preparar_datos_workshop.py
 └── scripts/
     ├── 01_demo_setup.sql
     └── 02_demo_queries.sql
@@ -45,15 +49,25 @@ Abre <http://localhost:8000>.
 
 ## Preparar la demo de Unity Catalog
 
-1. Abre un SQL Warehouse con permisos administrativos.
-2. Ejecuta `scripts/01_demo_setup.sql`.
-3. Ejecuta la primera consulta de `scripts/02_demo_queries.sql` para generar actividad y lineage.
-4. Configura Discovery desde la UI:
+La opción recomendada es abrir y ejecutar **Run All** en:
+
+```text
+/Workspace/Users/nicolas.jimenez@databricks.com/diners-unity-catalog-workshop/00_preparar_datos_workshop
+```
+
+El notebook crea 200 clientes, 50 comercios y 1.000 transacciones sintéticas; configura governed tags, comentarios, masks, row filter, vistas con lineage, resultados DQ, glosario y un documento en UC Volume.
+
+Después:
+
+1. Ejecuta una consulta sobre `diners_governance.tarjetas.transacciones_riesgo` para generar actividad.
+2. Configura Discovery desde la UI:
    - Crea o usa el dominio `Tarjetas`.
    - Asigna la tabla y la vista del catálogo `diners_governance`.
    - Agrega owner, descripción y una Page de definición.
    - Certifica la vista de riesgo si la funcionalidad está habilitada.
-5. Valida audit y lineage con las consultas preparadas.
+3. Valida audit y lineage con `scripts/02_demo_queries.sql`.
+
+Como alternativa reducida, `scripts/01_demo_setup.sql` prepara únicamente la tabla principal y las máscaras.
 
 Las funciones de mask revelan valores completos al grupo local `admins` y enmascaran para los demás. Esto permite validar la demo en el sandbox solicitado. Para producción, reemplaza ese grupo por un grupo de cuenta sincronizado desde el IdP y usa `is_account_group_member()`.
 
@@ -64,6 +78,16 @@ El workspace ya aplica políticas a algunos governed tags. El script usa valores
 - `pii_type = other | email`
 
 El dominio de negocio visible en Discover puede seguir llamándose **Tarjetas**; el governed tag `domain` utiliza la taxonomía corporativa existente.
+
+## Interacción con Genie Code
+
+Quince pasos incluyen un botón **Copiar prompt**. Los prompts están diseñados para tres tipos de interacción:
+
+1. Inspeccionar y explicar objetos existentes sin modificarlos.
+2. Generar SQL o propuestas de políticas para revisión.
+3. Producir entregables del workshop: RACI, plan piloto, queries de lineage/audit y minuta.
+
+Los prompts con DDL indican explícitamente que no deben ejecutar cambios automáticamente.
 
 ## Desplegar en Databricks Apps
 

@@ -28,6 +28,34 @@ No abras un segundo caso de uso. Los features avanzados son callouts:
 - Iceberg: interoperabilidad con otros motores.
 - IA: modelos, Genie y agentes bajo el mismo gobierno.
 
+## Patrón 1–2–3
+
+Cada paso aplicable sigue la misma secuencia:
+
+1. **Conversar:** conectar la capacidad con una situación de Diners.
+2. **Explicar:** mostrar el concepto y quién lo gobierna.
+3. **Genie Code:** copiar el prompt de la app y dejar que genere la consulta, validación o entregable.
+
+No ejecutes automáticamente el DDL generado por Genie Code. Revísalo en pantalla y compáralo con los objetos que dejó preparados el notebook.
+
+## Notebook previo
+
+Ejecuta **Run All** antes de abrir la sala:
+
+```text
+/Workspace/Users/nicolas.jimenez@databricks.com/diners-unity-catalog-workshop/00_preparar_datos_workshop
+```
+
+El run validado crea:
+
+- 200 clientes, 50 comercios y 1.000 transacciones sintéticas.
+- Governed tags compatibles con la taxonomía del sandbox.
+- Masks de PAN/email y row filter por país.
+- Vistas `transacciones_riesgo` y `fraud_kpis` con lineage.
+- `dq_results`, `business_glossary` y un documento en UC Volume.
+
+Discovery requiere el último paso manual de curación: Domain, Page, asignación de activos y certificación desde la UI.
+
 ## Distribución de tiempo
 
 - 0–8: contexto y objetos.

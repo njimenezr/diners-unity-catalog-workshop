@@ -181,6 +181,73 @@
       border-radius: 0 9px 9px 0;
       font-weight: 700;
     }
+    .method {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 18px 0;
+    }
+    .method-item {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--white);
+    }
+    .method-item strong {
+      display: block;
+      color: var(--blue);
+      font-size: 12px;
+    }
+    .method-item span { color: var(--muted); font-size: 11px; }
+    .method-item.genie { border-color: var(--red); background: #fff7f5; }
+    .method-item.disabled { opacity: .45; }
+    .prompt-card {
+      margin-top: 22px;
+      overflow: hidden;
+      border: 1px solid var(--blue);
+      border-radius: 11px;
+      background: var(--white);
+    }
+    .prompt-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 14px;
+      color: var(--white);
+      background: var(--blue);
+    }
+    .prompt-head strong { font-size: 13px; }
+    .copy-btn {
+      padding: 5px 10px;
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: 999px;
+      color: var(--white);
+      background: transparent;
+      font-size: 11px;
+      font-weight: 750;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,.12); }
+    .prompt-text {
+      margin: 0;
+      padding: 16px;
+      max-height: 300px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--ink);
+      background: var(--surface);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .prompt-expected {
+      padding: 11px 14px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .prompt-expected strong { color: var(--success); }
     .talk {
       margin: 18px 0;
       padding: 16px;
@@ -220,6 +287,7 @@
       .brand-copy span, .timer-label { display: none; }
       main { padding-top: 18px; }
       .detail-head { grid-template-columns: 1fr; }
+      .method { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -286,6 +354,14 @@
       );
     }
 
+    function promptCount(section = null) {
+      const sections = section ? [section] : state.workshop.sections;
+      return sections.reduce(
+        (sum, item) => sum + item.steps.filter(step => Boolean(step.geniePrompt)).length,
+        0
+      );
+    }
+
     function renderLanding() {
       const w = state.workshop;
       const sectionCards = w.sections.map((section, index) => {
@@ -295,7 +371,10 @@
             <span class="section-index">0${index + 1}</span>
             <h3>${esc(section.title)}</h3>
             <p>${esc(section.subtitle)}</p>
-            <div class="card-meta"><span>${section.minutes} min</span><span>${section.steps.length} pasos</span></div>
+            <div class="card-meta">
+              <span>${section.minutes} min</span>
+              <span>${promptCount(section)} ${promptCount(section) === 1 ? "prompt" : "prompts"}</span>
+            </div>
             <div class="progress-shell"><div class="progress-fill" style="width:${progress}%"></div></div>
           </button>`;
       }).join("");
@@ -317,6 +396,7 @@
             <div class="stats">
               <div class="stat"><strong>${w.durationMinutes}</strong><span>minutos</span></div>
               <div class="stat"><strong>${w.sections.length}</strong><span>bloques</span></div>
+              <div class="stat"><strong>${promptCount()}</strong><span>prompts</span></div>
               <div class="stat"><strong>${completedSteps()}/${totalSteps()}</strong><span>pasos</span></div>
             </div>
           </aside>
@@ -386,6 +466,15 @@
       const links = (step.links || []).map(item =>
         `<a class="resource" href="${esc(item.url)}" target="_blank" rel="noreferrer">${esc(item.label)} ↗</a>`
       ).join("");
+      const promptHtml = step.geniePrompt ? `
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <strong>3 · Pruébalo con Genie Code</strong>
+            <button class="copy-btn" type="button" onclick="copyPrompt(this)">Copiar prompt</button>
+          </div>
+          <pre class="prompt-text">${esc(step.geniePrompt)}</pre>
+          ${step.genieExpected ? `<div class="prompt-expected"><strong>Resultado esperado:</strong> ${esc(step.genieExpected)}</div>` : ""}
+        </div>` : "";
 
       document.getElementById("detail").innerHTML = `
         <button class="btn" onclick="goHome()" type="button">← Agenda</button>
@@ -406,9 +495,24 @@
             </div>
             <h2>${esc(step.title)}</h2>
             <p class="step-description">${esc(step.description)}</p>
+            <div class="method" aria-label="Método de aprendizaje">
+              <div class="method-item">
+                <strong>1 · Conversar</strong>
+                <span>Conectar con la realidad de Diners</span>
+              </div>
+              <div class="method-item">
+                <strong>2 · Explicar</strong>
+                <span>Entender capacidad y gobierno</span>
+              </div>
+              <div class="method-item genie ${step.geniePrompt ? "" : "disabled"}">
+                <strong>3 · Genie Code</strong>
+                <span>${step.geniePrompt ? "Construir, consultar o validar" : "No aplica en este paso"}</span>
+              </div>
+            </div>
             <div class="message">${esc(step.keyMessage)}</div>
             <h3>Qué mostrar o conversar</h3>
             <ul class="actions">${step.actions.map(action => `<li>${esc(action)}</li>`).join("")}</ul>
+            ${promptHtml}
             ${links ? `<div class="resources">${links}</div>` : ""}
           </article>
           <aside class="step-side">
@@ -465,6 +569,15 @@
       state.done.has(id) ? state.done.delete(id) : state.done.add(id);
       saveProgress();
       renderDetail();
+    }
+
+    function copyPrompt(button) {
+      const text = button.closest(".prompt-card").querySelector(".prompt-text").textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const original = button.textContent;
+        button.textContent = "Copiado";
+        setTimeout(() => { button.textContent = original; }, 1600);
+      });
     }
 
     function previousStep() {
