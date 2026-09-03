@@ -1,0 +1,103 @@
+# Diners — Unity Catalog: Visión de Gobierno
+
+Workshop interactivo de 90 minutos para presentar gobierno de datos con Unity Catalog. El recorrido cubre:
+
+- Modelo operativo: consumidor, curator y administrador.
+- Discover page, Domains, Pages, Genie One y Catalog Explorer.
+- Metastore, catálogos, schemas y activos gobernados.
+- RBAC, ABAC, governed tags, row filters y column masks.
+- Clasificación, certificación, lineage, calidad y auditoría.
+- Federation, Delta Sharing, Clean Rooms, Iceberg y gobierno de IA.
+- Coexistencia gradual entre Teradata y Databricks.
+
+Los datos y nombres usados en la demo son sintéticos.
+
+## Estructura
+
+```text
+.
+├── app.yaml
+├── databricks.yml
+├── main.py
+├── requirements.txt
+├── FACILITATOR.md
+├── data/
+│   └── workshop.json
+├── frontend/
+│   └── index.html
+└── scripts/
+    ├── 01_demo_setup.sql
+    └── 02_demo_queries.sql
+```
+
+La estructura sigue el patrón del workshop `banco-popular-genie-workshop`: FastAPI sirve contenido estructurado desde JSON y un frontend single-page guarda el progreso localmente.
+
+## Ejecutar localmente
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+```
+
+Abre <http://localhost:8000>.
+
+## Preparar la demo de Unity Catalog
+
+1. Abre un SQL Warehouse con permisos administrativos.
+2. Ejecuta `scripts/01_demo_setup.sql`.
+3. Ejecuta la primera consulta de `scripts/02_demo_queries.sql` para generar actividad y lineage.
+4. Configura Discovery desde la UI:
+   - Crea o usa el dominio `Tarjetas`.
+   - Asigna la tabla y la vista del catálogo `diners_governance`.
+   - Agrega owner, descripción y una Page de definición.
+   - Certifica la vista de riesgo si la funcionalidad está habilitada.
+5. Valida audit y lineage con las consultas preparadas.
+
+Las funciones de mask revelan valores completos al grupo local `admins` y enmascaran para los demás. Esto permite validar la demo en el sandbox solicitado. Para producción, reemplaza ese grupo por un grupo de cuenta sincronizado desde el IdP y usa `is_account_group_member()`.
+
+El workspace ya aplica políticas a algunos governed tags. El script usa valores permitidos allí:
+
+- `domain = payments`
+- `sensitivity = HIGH`
+- `pii_type = other | email`
+
+El dominio de negocio visible en Discover puede seguir llamándose **Tarjetas**; el governed tag `domain` utiliza la taxonomía corporativa existente.
+
+## Desplegar en Databricks Apps
+
+Workspace objetivo:
+
+```text
+https://fe-sandbox-serverless-tko-nj.cloud.databricks.com
+```
+
+Perfil CLI:
+
+```text
+fe-sandbox-tko-nj
+```
+
+Validación y despliegue:
+
+```bash
+databricks bundle validate -t dev --profile fe-sandbox-tko-nj
+databricks bundle deploy -t dev --profile fe-sandbox-tko-nj
+databricks bundle run diners_uc_workshop -t dev --profile fe-sandbox-tko-nj
+```
+
+También puede usarse el flujo integrado:
+
+```bash
+databricks apps validate --profile fe-sandbox-tko-nj
+databricks apps deploy -t dev --profile fe-sandbox-tko-nj
+```
+
+## Documentación
+
+- [Discover data](https://docs.databricks.com/aws/en/discover/)
+- [Data discovery in Unity Catalog](https://docs.databricks.com/aws/en/data-governance/unity-catalog/data-discovery)
+- [Unity Catalog](https://docs.databricks.com/aws/en/data-governance/unity-catalog/)
+- [Row filters and column masks](https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks/)
+- [Audit log system table](https://docs.databricks.com/aws/en/admin/system-tables/audit-logs)

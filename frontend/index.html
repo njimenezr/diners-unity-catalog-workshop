@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Workshop de Unity Catalog y gobierno de datos para Diners">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>Unity Catalog: Visión de Gobierno — Diners</title>
+  <style>
+    :root {
+      --red: #ff3621;
+      --red-dark: #c72b1b;
+      --blue: #17365d;
+      --blue-soft: #eaf1f8;
+      --ink: #17212b;
+      --muted: #5f6b76;
+      --line: #dde2e7;
+      --surface: #f6f7f9;
+      --white: #ffffff;
+      --success: #147d64;
+      --warning: #a35b00;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--white);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    a { color: var(--blue); }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(12px);
+    }
+    .topbar-inner {
+      width: min(1180px, calc(100% - 32px));
+      min-height: 64px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      width: 34px; height: 34px; border-radius: 9px;
+      display: grid; place-items: center;
+      color: var(--white); background: var(--red);
+      font-weight: 800;
+    }
+    .brand-copy strong { display: block; font-size: 14px; }
+    .brand-copy span { color: var(--muted); font-size: 12px; }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+    .timer {
+      min-width: 68px;
+      color: var(--blue);
+      font-variant-numeric: tabular-nums;
+      font-weight: 750;
+      text-align: center;
+    }
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 14px;
+      color: var(--ink);
+      background: var(--white);
+      font-weight: 650;
+      font-size: 13px;
+    }
+    .btn:hover { border-color: var(--blue); }
+    .btn.primary { color: var(--white); background: var(--blue); border-color: var(--blue); }
+    .btn.ghost { border-color: transparent; color: var(--muted); }
+    main { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 40px 0 70px; }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(260px, .8fr);
+      gap: 34px;
+      align-items: end;
+      padding: 26px 0 38px;
+    }
+    .eyebrow {
+      color: var(--red-dark);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    h1 { max-width: 800px; margin: 8px 0 14px; font-size: clamp(34px, 5vw, 60px); line-height: 1.02; letter-spacing: -.045em; }
+    h2 { margin: 0; font-size: 25px; letter-spacing: -.025em; }
+    h3 { margin: 0; font-size: 17px; }
+    .lead { max-width: 760px; color: var(--muted); font-size: 18px; }
+    .hero-panel {
+      border-left: 4px solid var(--red);
+      background: var(--surface);
+      padding: 20px;
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+    .hero-panel strong { display: block; margin-bottom: 7px; }
+    .hero-panel p { margin: 0; color: var(--muted); font-size: 14px; }
+    .stats { display: flex; gap: 24px; margin-top: 18px; }
+    .stat strong { color: var(--blue); font-size: 24px; }
+    .stat span { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+    .section-heading { margin: 34px 0 16px; display: flex; justify-content: space-between; align-items: end; gap: 20px; }
+    .section-heading p { margin: 0; color: var(--muted); font-size: 14px; }
+    .governance {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+      margin-bottom: 28px;
+    }
+    .role {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+    }
+    .role-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
+    .role-label { padding: 3px 8px; border-radius: 999px; color: var(--blue); background: var(--blue-soft); font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .role p { margin: 0; color: var(--muted); font-size: 13px; }
+    .flow { display: flex; align-items: center; gap: 8px; margin: 10px 0 34px; overflow-x: auto; padding-bottom: 4px; }
+    .flow-node { flex: 0 0 auto; padding: 7px 10px; border-radius: 8px; background: var(--surface); font-size: 12px; font-weight: 700; }
+    .flow-arrow { color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .section-card {
+      min-height: 186px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      transition: transform .15s, border-color .15s;
+    }
+    .section-card:hover { transform: translateY(-2px); border-color: var(--blue); }
+    .section-index { color: var(--red-dark); font-size: 12px; font-weight: 800; }
+    .section-card h3 { margin: 8px 0 6px; }
+    .section-card p { margin: 0; color: var(--muted); font-size: 12px; flex: 1; }
+    .card-meta { display: flex; justify-content: space-between; margin-top: 18px; color: var(--muted); font-size: 11px; }
+    .progress-shell { height: 4px; margin-top: 9px; border-radius: 3px; background: var(--line); overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--success); transition: width .2s; }
+    .objectives { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; margin-top: 34px; padding: 24px; background: var(--surface); border-radius: var(--radius); }
+    .objectives ul { margin: 12px 0 0; padding-left: 18px; }
+    .objectives li { margin: 7px 0; color: var(--muted); font-size: 14px; }
+    .facilitator-note { padding-left: 18px; border-left: 3px solid var(--blue); }
+    .facilitator-note p { color: var(--muted); font-size: 14px; }
+    .resources { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .resource { padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 650; }
+    .resource:hover { border-color: var(--blue); }
+    .detail-head { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: end; padding: 20px 0 26px; border-bottom: 1px solid var(--line); }
+    .detail-head p { margin: 7px 0 0; color: var(--muted); }
+    .detail-meta { color: var(--blue); font-weight: 750; }
+    .step-nav { display: flex; gap: 7px; margin: 20px 0; overflow-x: auto; padding-bottom: 5px; }
+    .step-dot {
+      flex: 0 0 auto; min-width: 39px; height: 39px; padding: 0 10px;
+      border: 1px solid var(--line); border-radius: 10px;
+      background: var(--white); color: var(--muted); font-weight: 750;
+    }
+    .step-dot.active { color: var(--white); border-color: var(--blue); background: var(--blue); }
+    .step-dot.done { color: var(--success); border-color: var(--success); }
+    .step-panel { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(270px, .7fr); gap: 20px; }
+    .step-main, .step-side { border: 1px solid var(--line); border-radius: var(--radius); }
+    .step-main { padding: 26px; }
+    .step-side { padding: 20px; background: var(--surface); align-self: start; }
+    .step-kicker { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .step-kicker span { padding: 3px 7px; border-radius: 999px; background: var(--blue-soft); color: var(--blue); }
+    .step-main h2 { margin: 10px 0 8px; }
+    .step-description { color: var(--muted); }
+    .message {
+      margin: 20px 0;
+      padding: 16px;
+      border-left: 4px solid var(--red);
+      background: #fff7f5;
+      border-radius: 0 9px 9px 0;
+      font-weight: 700;
+    }
+    .talk {
+      margin: 18px 0;
+      padding: 16px;
+      border-radius: 10px;
+      color: var(--blue);
+      background: var(--blue-soft);
+      font-size: 14px;
+    }
+    .actions { margin: 10px 0 0; padding: 0; list-style: none; }
+    .actions li { position: relative; padding: 8px 0 8px 27px; border-bottom: 1px solid var(--line); font-size: 14px; }
+    .actions li:last-child { border-bottom: 0; }
+    .actions li::before { content: ""; position: absolute; left: 4px; top: 15px; width: 8px; height: 8px; border: 2px solid var(--red); border-radius: 50%; }
+    .feature-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .feature { padding: 4px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--white); color: var(--muted); font-size: 11px; }
+    .complete {
+      width: 100%;
+      margin-top: 18px;
+      padding: 11px;
+      border: 1px solid var(--success);
+      border-radius: 9px;
+      color: var(--success);
+      background: var(--white);
+      font-weight: 750;
+    }
+    .complete.done { color: var(--white); background: var(--success); }
+    .step-controls { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
+    .hidden { display: none !important; }
+    footer { border-top: 1px solid var(--line); padding: 24px 16px; text-align: center; color: var(--muted); font-size: 12px; }
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .step-panel, .objectives { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .hero { grid-template-columns: 1fr; }
+      .governance, .grid { grid-template-columns: 1fr; }
+      .topbar-inner { min-height: 58px; }
+      .brand-copy span, .timer-label { display: none; }
+      main { padding-top: 18px; }
+      .detail-head { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">D</div>
+        <div class="brand-copy">
+          <strong>Diners · Databricks</strong>
+          <span>Unity Catalog — Workshop de Gobierno</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="timer-label" style="font-size:12px;color:var(--muted)">Tiempo</span>
+        <span class="timer" id="timer">00:00</span>
+        <button class="btn" id="timer-toggle" type="button">Iniciar</button>
+        <button class="btn ghost" id="timer-reset" type="button">Reiniciar</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="landing"></section>
+    <section id="detail" class="hidden"></section>
+  </main>
+
+  <footer>Datos de ejemplo únicamente · Workshop preparado para Diners · Databricks 2026</footer>
+
+  <script>
+    const state = {
+      workshop: null,
+      view: "landing",
+      sectionIndex: 0,
+      stepIndex: 0,
+      done: new Set(JSON.parse(localStorage.getItem("diners-uc-progress") || "[]")),
+      timerSeconds: 0,
+      timerHandle: null
+    };
+
+    const esc = value => {
+      const div = document.createElement("div");
+      div.textContent = value ?? "";
+      return div.innerHTML;
+    };
+
+    function saveProgress() {
+      localStorage.setItem("diners-uc-progress", JSON.stringify([...state.done]));
+    }
+
+    function sectionProgress(section) {
+      const complete = section.steps.filter(step => state.done.has(step.id)).length;
+      return section.steps.length ? Math.round((complete / section.steps.length) * 100) : 0;
+    }
+
+    function totalSteps() {
+      return state.workshop.sections.reduce((sum, section) => sum + section.steps.length, 0);
+    }
+
+    function completedSteps() {
+      return state.workshop.sections.reduce(
+        (sum, section) => sum + section.steps.filter(step => state.done.has(step.id)).length,
+        0
+      );
+    }
+
+    function renderLanding() {
+      const w = state.workshop;
+      const sectionCards = w.sections.map((section, index) => {
+        const progress = sectionProgress(section);
+        return `
+          <button class="section-card" type="button" onclick="openSection(${index})" style="text-align:left">
+            <span class="section-index">0${index + 1}</span>
+            <h3>${esc(section.title)}</h3>
+            <p>${esc(section.subtitle)}</p>
+            <div class="card-meta"><span>${section.minutes} min</span><span>${section.steps.length} pasos</span></div>
+            <div class="progress-shell"><div class="progress-fill" style="width:${progress}%"></div></div>
+          </button>`;
+      }).join("");
+
+      const resources = w.resources.map(item =>
+        `<a class="resource" href="${esc(item.url)}" target="_blank" rel="noreferrer">${esc(item.label)} ↗</a>`
+      ).join("");
+
+      document.getElementById("landing").innerHTML = `
+        <div class="hero">
+          <div>
+            <div class="eyebrow">${esc(w.customer)} · ${w.durationMinutes} minutos</div>
+            <h1>${esc(w.title)}</h1>
+            <p class="lead">${esc(w.tagline)}.</p>
+          </div>
+          <aside class="hero-panel">
+            <strong>Resultado de la sesión</strong>
+            <p>Dos dominios piloto, responsables claros y un siguiente laboratorio acordado.</p>
+            <div class="stats">
+              <div class="stat"><strong>${w.durationMinutes}</strong><span>minutos</span></div>
+              <div class="stat"><strong>${w.sections.length}</strong><span>bloques</span></div>
+              <div class="stat"><strong>${completedSteps()}/${totalSteps()}</strong><span>pasos</span></div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="section-heading">
+          <div><div class="eyebrow">Modelo operativo</div><h2>Tres niveles de gobierno</h2></div>
+          <p>Uso, curación y control con separación de responsabilidades</p>
+        </div>
+        <div class="governance">
+          <article class="role">
+            <div class="role-top"><h3>Consumidor</h3><span class="role-label">Usa</span></div>
+            <p>Descubre por dominio, entiende Pages y certificación, consulta datos y recibe automáticamente masks y row filters.</p>
+          </article>
+          <article class="role">
+            <div class="role-top"><h3>Curator / Steward</h3><span class="role-label">Cura</span></div>
+            <p>Organiza dominios, asigna activos, publica Pages, aplica señales de confianza y mejora la experiencia en Discover.</p>
+          </article>
+          <article class="role">
+            <div class="role-top"><h3>Administrador</h3><span class="role-label">Gobierna</span></div>
+            <p>Administra identidad, privilegios, ABAC, tag policies, storage y auditoría. Delega con MANAGE DISCOVERY.</p>
+          </article>
+        </div>
+
+        <div class="flow" aria-label="Flujo del workshop">
+          ${["Discover", "Entender", "Solicitar / acceder", "Mask + row filter", "Consumir", "Lineage", "Audit"].map(
+            (node, index, nodes) => `<span class="flow-node">${node}</span>${index < nodes.length - 1 ? '<span class="flow-arrow">→</span>' : ''}`
+          ).join("")}
+        </div>
+
+        <div class="section-heading">
+          <div><div class="eyebrow">Agenda</div><h2>Recorrido de 90 minutos</h2></div>
+          <p>Sin pausa · una sola historia · máximo impacto en vivo</p>
+        </div>
+        <div class="grid">${sectionCards}</div>
+
+        <div class="objectives">
+          <div>
+            <h3>Objetivos</h3>
+            <ul>${w.objectives.map(item => `<li>${esc(item)}</li>`).join("")}</ul>
+          </div>
+          <div class="facilitator-note">
+            <h3>Apertura sugerida</h3>
+            <p>“${esc(w.facilitator.opening)}”</p>
+            <strong style="font-size:12px">Plan de tiempo</strong>
+            <p>${esc(w.facilitator.timeRule)}</p>
+          </div>
+        </div>
+
+        <div class="section-heading">
+          <div><div class="eyebrow">Referencias</div><h2>Documentación</h2></div>
+        </div>
+        <div class="resources">${resources}</div>`;
+    }
+
+    function renderDetail() {
+      const section = state.workshop.sections[state.sectionIndex];
+      const step = section.steps[state.stepIndex];
+      const isDone = state.done.has(step.id);
+      const stepDots = section.steps.map((item, index) => `
+        <button
+          class="step-dot ${index === state.stepIndex ? "active" : ""} ${state.done.has(item.id) ? "done" : ""}"
+          onclick="setStep(${index})"
+          title="${esc(item.title)}"
+          type="button">${state.done.has(item.id) ? "✓" : index + 1}</button>
+      `).join("");
+      const links = (step.links || []).map(item =>
+        `<a class="resource" href="${esc(item.url)}" target="_blank" rel="noreferrer">${esc(item.label)} ↗</a>`
+      ).join("");
+
+      document.getElementById("detail").innerHTML = `
+        <button class="btn" onclick="goHome()" type="button">← Agenda</button>
+        <div class="detail-head">
+          <div>
+            <div class="eyebrow">Bloque ${state.sectionIndex + 1} de ${state.workshop.sections.length}</div>
+            <h1 style="font-size:clamp(30px,4vw,46px);margin-bottom:0">${esc(section.title)}</h1>
+            <p>${esc(section.subtitle)}</p>
+          </div>
+          <div class="detail-meta">${section.minutes} minutos · ${section.steps.length} pasos</div>
+        </div>
+        <div class="step-nav">${stepDots}</div>
+        <div class="step-panel">
+          <article class="step-main">
+            <div class="step-kicker">
+              <span>${esc(step.type)}</span>
+              ${esc(step.persona)} · ${step.minutes} min
+            </div>
+            <h2>${esc(step.title)}</h2>
+            <p class="step-description">${esc(step.description)}</p>
+            <div class="message">${esc(step.keyMessage)}</div>
+            <h3>Qué mostrar o conversar</h3>
+            <ul class="actions">${step.actions.map(action => `<li>${esc(action)}</li>`).join("")}</ul>
+            ${links ? `<div class="resources">${links}</div>` : ""}
+          </article>
+          <aside class="step-side">
+            <h3>Talk track</h3>
+            <div class="talk">“${esc(step.talkTrack)}”</div>
+            <h3>Features cubiertos</h3>
+            <div class="feature-list">${step.features.map(feature => `<span class="feature">${esc(feature)}</span>`).join("")}</div>
+            <button class="complete ${isDone ? "done" : ""}" onclick="toggleDone('${esc(step.id)}')" type="button">
+              ${isDone ? "✓ Completado" : "Marcar completado"}
+            </button>
+          </aside>
+        </div>
+        <div class="step-controls">
+          <button class="btn" onclick="previousStep()" ${state.sectionIndex === 0 && state.stepIndex === 0 ? "disabled" : ""} type="button">← Anterior</button>
+          <button class="btn primary" onclick="nextStep()" ${state.sectionIndex === state.workshop.sections.length - 1 && state.stepIndex === section.steps.length - 1 ? "disabled" : ""} type="button">Siguiente →</button>
+        </div>`;
+    }
+
+    function render() {
+      const landing = document.getElementById("landing");
+      const detail = document.getElementById("detail");
+      if (state.view === "landing") {
+        landing.classList.remove("hidden");
+        detail.classList.add("hidden");
+        renderLanding();
+      } else {
+        landing.classList.add("hidden");
+        detail.classList.remove("hidden");
+        renderDetail();
+      }
+    }
+
+    function openSection(index) {
+      state.view = "detail";
+      state.sectionIndex = index;
+      state.stepIndex = 0;
+      render();
+      window.scrollTo({ top: 0 });
+    }
+
+    function goHome() {
+      state.view = "landing";
+      render();
+      window.scrollTo({ top: 0 });
+    }
+
+    function setStep(index) {
+      state.stepIndex = index;
+      renderDetail();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function toggleDone(id) {
+      state.done.has(id) ? state.done.delete(id) : state.done.add(id);
+      saveProgress();
+      renderDetail();
+    }
+
+    function previousStep() {
+      if (state.stepIndex > 0) {
+        state.stepIndex -= 1;
+      } else if (state.sectionIndex > 0) {
+        state.sectionIndex -= 1;
+        state.stepIndex = state.workshop.sections[state.sectionIndex].steps.length - 1;
+      }
+      renderDetail();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function nextStep() {
+      const section = state.workshop.sections[state.sectionIndex];
+      if (state.stepIndex < section.steps.length - 1) {
+        state.stepIndex += 1;
+      } else if (state.sectionIndex < state.workshop.sections.length - 1) {
+        state.sectionIndex += 1;
+        state.stepIndex = 0;
+      }
+      renderDetail();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function updateTimer() {
+      const minutes = Math.floor(state.timerSeconds / 60).toString().padStart(2, "0");
+      const seconds = (state.timerSeconds % 60).toString().padStart(2, "0");
+      document.getElementById("timer").textContent = `${minutes}:${seconds}`;
+    }
+
+    document.getElementById("timer-toggle").addEventListener("click", event => {
+      if (state.timerHandle) {
+        clearInterval(state.timerHandle);
+        state.timerHandle = null;
+        event.currentTarget.textContent = "Continuar";
+      } else {
+        state.timerHandle = setInterval(() => {
+          state.timerSeconds += 1;
+          updateTimer();
+        }, 1000);
+        event.currentTarget.textContent = "Pausar";
+      }
+    });
+
+    document.getElementById("timer-reset").addEventListener("click", () => {
+      if (state.timerHandle) clearInterval(state.timerHandle);
+      state.timerHandle = null;
+      state.timerSeconds = 0;
+      document.getElementById("timer-toggle").textContent = "Iniciar";
+      updateTimer();
+    });
+
+    fetch("/api/workshop")
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then(workshop => {
+        state.workshop = workshop;
+        render();
+      })
+      .catch(error => {
+        document.getElementById("landing").innerHTML = `
+          <div class="hero-panel" style="margin-top:40px">
+            <strong>No se pudo cargar el workshop</strong>
+            <p>${esc(error.message)}. Revisa que la aplicación esté iniciada correctamente.</p>
+          </div>`;
+      });
+  </script>
+</body>
+</html>

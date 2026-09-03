@@ -1,0 +1,397 @@
+{
+  "title": "Unity Catalog: Visión de Gobierno Databricks",
+  "customer": "Diners",
+  "durationMinutes": 90,
+  "language": "Español",
+  "audience": "Gobierno de datos, seguridad, arquitectura, datos, riesgo y analítica",
+  "tagline": "Del descubrimiento al control y la evidencia, sobre una sola tabla",
+  "objectives": [
+    "Entender cómo Unity Catalog unifica gobierno de datos y activos de IA.",
+    "Diferenciar cómo consume un usuario, cómo cura un data steward y cómo gobierna un administrador.",
+    "Recorrer Discovery, clasificación, acceso fino, lineage, calidad y auditoría en una sola historia.",
+    "Acordar dos dominios piloto y los responsables del siguiente paso."
+  ],
+  "facilitator": {
+    "opening": "No voy a mostrar una lista de features. Vamos a seguir una transacción de tarjeta desde que un analista la descubre hasta que auditoría obtiene evidencia de quién la usó.",
+    "coreDemoObject": "diners_governance.tarjetas.transacciones_tarjeta",
+    "timeRule": "Si al minuto 55 vas atrasado, omite la pantalla de calidad y pasa directamente a lineage y audit.",
+    "fallback": "Mantén capturas del flujo Discover → Catalog Explorer → consulta enmascarada → lineage → audit."
+  },
+  "sections": [
+    {
+      "id": "contexto",
+      "title": "Contexto y visión",
+      "subtitle": "Por qué gobierno unificado para Diners",
+      "minutes": 8,
+      "color": "red",
+      "steps": [
+        {
+          "id": "contexto-1",
+          "title": "Alinear el problema",
+          "minutes": 4,
+          "persona": "Todos",
+          "type": "Conversación",
+          "description": "Conecta el workshop con PII, PCI DSS, trazabilidad regulatoria y coexistencia con Teradata.",
+          "keyMessage": "El objetivo no es catalogar por catalogar: es reducir exposición y acelerar el acceso seguro a datos confiables.",
+          "talkTrack": "Diners no necesita mover todo para empezar a gobernar. Unity Catalog puede convertirse en el plano común mientras Teradata conserva reportes y procesos críticos.",
+          "actions": [
+            "Preguntar qué evidencia solicita auditoría con mayor frecuencia.",
+            "Confirmar los dominios más relevantes: Tarjetas, Fraude, Cobranzas, Crédito o Comercios.",
+            "Anunciar que una sola tabla recorrerá toda la sesión."
+          ],
+          "features": ["Gobierno unificado", "Datos + IA", "Coexistencia"]
+        },
+        {
+          "id": "contexto-2",
+          "title": "Modelo de objetos",
+          "minutes": 4,
+          "persona": "Arquitectura",
+          "type": "Explicación",
+          "description": "Presenta el namespace y los activos gobernados sin entrar todavía en configuración.",
+          "keyMessage": "Metastore → catálogo → schema → tabla, vista, volumen, función, modelo y otros activos.",
+          "talkTrack": "El catálogo no es solo un inventario de tablas. Es el lugar donde viven owners, permisos, tags, lineage y políticas.",
+          "actions": [
+            "Dibujar el namespace de tres niveles.",
+            "Usar catálogos para límites organizacionales y schemas para dominios o productos.",
+            "Nombrar tablas administradas, externas y volúmenes."
+          ],
+          "features": ["Metastore", "Catalogs", "Schemas", "Tables", "Views", "Volumes", "Models"]
+        }
+      ]
+    },
+    {
+      "id": "modelo-gobierno",
+      "title": "Modelo de gobierno y Discovery",
+      "subtitle": "Consumidor, curator y administrador",
+      "minutes": 15,
+      "color": "blue",
+      "steps": [
+        {
+          "id": "modelo-1",
+          "title": "Tres niveles de interacción",
+          "minutes": 5,
+          "persona": "Todos",
+          "type": "Explicación",
+          "description": "Separa claramente consumo, curación y administración.",
+          "keyMessage": "El usuario consume lo ya gobernado; el curator hace que se encuentre y se confíe; el administrador define el marco y delega.",
+          "talkTrack": "Evitemos convertir a Seguridad en editor del glosario. El administrador crea la guardrail; el owner de Riesgo cura el dominio; el analista consume.",
+          "actions": [
+            "Consumidor: busca, entiende, solicita y usa datos dentro de sus permisos.",
+            "Curator: organiza dominios, Pages, certificaciones, comentarios y recomendaciones.",
+            "Administrador: identidad, GRANT/ABAC, tag policies, masks, storage y auditoría."
+          ],
+          "features": ["Consumer", "Curator", "Administrator", "Delegation", "Least privilege"]
+        },
+        {
+          "id": "modelo-2",
+          "title": "Discover: la puerta de entrada del negocio",
+          "minutes": 6,
+          "persona": "Consumidor / Curator",
+          "type": "Demo",
+          "description": "Contrasta la experiencia curada de Discover con el inventario técnico de Catalog Explorer.",
+          "keyMessage": "Discover muestra activos recomendados por dominio; Catalog Explorer muestra el inventario completo y sus detalles técnicos.",
+          "talkTrack": "Fraude no debería aprender que la tabla vive en prod_silver. Entra a Discover, abre Tarjetas y encuentra el activo certificado con definición, owner y lineage.",
+          "actions": [
+            "Abrir Discover desde el sidebar.",
+            "Navegar por dominio y tipo de activo.",
+            "Mostrar búsqueda por keyword o semántica y recordar que los resultados respetan permisos.",
+            "Mostrar Pages como definiciones de negocio usadas también por Genie One.",
+            "Abrir el mismo activo en Catalog Explorer: properties, permissions, sample data y lineage."
+          ],
+          "features": ["Discover page", "Domains", "Pages", "Genie One", "Search", "Catalog Explorer", "AI recommendations"],
+          "links": [
+            {
+              "label": "Discover data",
+              "url": "https://docs.databricks.com/aws/en/discover/"
+            },
+            {
+              "label": "Data discovery in Unity Catalog",
+              "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/data-discovery"
+            }
+          ]
+        },
+        {
+          "id": "modelo-3",
+          "title": "Curación y confianza",
+          "minutes": 4,
+          "persona": "Curator / Admin",
+          "type": "Explicación",
+          "description": "Explica los mecanismos que convierten inventario en una experiencia confiable.",
+          "keyMessage": "El admin concede MANAGE DISCOVERY; el curator administra su dominio y las señales de confianza.",
+          "talkTrack": "La delegación puede ocurrir a nivel de cuenta, dominio o subdominio. No hace falta entregar privilegios administrativos sobre los datos.",
+          "actions": [
+            "Explicar MANAGE DISCOVERY.",
+            "Mostrar certificación y deprecación.",
+            "Conectar governed tags, comentarios y owners con búsqueda.",
+            "Definir dos dominios piloto: Tarjetas/Fraude y Cobranzas/Crédito."
+          ],
+          "features": ["MANAGE DISCOVERY", "Certification", "Deprecation", "Governed tags", "Comments", "Ownership"]
+        }
+      ]
+    },
+    {
+      "id": "demo",
+      "title": "Demo continua",
+      "subtitle": "Discovery → política → consumo → evidencia",
+      "minutes": 42,
+      "color": "purple",
+      "steps": [
+        {
+          "id": "demo-1",
+          "title": "Encontrar el activo confiable",
+          "minutes": 5,
+          "persona": "Analista de Fraude",
+          "type": "Demo",
+          "description": "Busca la tabla de transacciones desde Discover y valida si es adecuada para el caso.",
+          "keyMessage": "Descubrir no significa tener acceso irrestricto: Search y Discover respetan los permisos de Unity Catalog.",
+          "talkTrack": "El analista encuentra la versión certificada, entiende su SLA y evita usar una tabla duplicada o deprecada.",
+          "actions": [
+            "Dominio Tarjetas o Fraude.",
+            "Asset certificado, owner, descripción y Page asociada.",
+            "Mostrar popularidad o Insights si está disponible."
+          ],
+          "features": ["Discover", "Domains", "Search", "Certification", "Insights"]
+        },
+        {
+          "id": "demo-2",
+          "title": "Clasificar y etiquetar",
+          "minutes": 5,
+          "persona": "Data Steward",
+          "type": "Demo",
+          "description": "Abre el activo en Catalog Explorer y revisa clasificación de columnas.",
+          "keyMessage": "Los governed tags convierten una taxonomía acordada en metadatos consistentes y utilizables por políticas.",
+          "talkTrack": "PAN y email no dependen de que cada equipo escriba 'confidencial' de una forma distinta.",
+          "actions": [
+            "Mostrar tags: dominio=tarjetas, sensibilidad=confidencial, pii=true.",
+            "Explicar valores permitidos de governed tags.",
+            "Mostrar clasificación de datos sensibles cuando esté habilitada."
+          ],
+          "features": ["Governed tags", "Data classification", "PII", "Catalog Explorer"]
+        },
+        {
+          "id": "demo-3",
+          "title": "Definir acceso escalable",
+          "minutes": 6,
+          "persona": "Administrador",
+          "type": "Demo",
+          "description": "Contrasta grants a grupos con políticas basadas en atributos.",
+          "keyMessage": "RBAC delega por grupo; ABAC escala la política usando atributos del dato y del usuario.",
+          "talkTrack": "Cuando aparece una nueva tabla confidencial, la política debe aplicar por su tag, no depender de un ticket manual olvidado.",
+          "actions": [
+            "Mostrar USE CATALOG, USE SCHEMA y SELECT a un grupo.",
+            "Explicar herencia y mínimo privilegio.",
+            "Mostrar una política ABAC basada en sensibilidad y dominio.",
+            "Recordar que los grupos deben provenir del IdP mediante SCIM."
+          ],
+          "features": ["RBAC", "ABAC", "Groups", "Privilege inheritance", "SCIM"]
+        },
+        {
+          "id": "demo-4",
+          "title": "Aplicar privacidad dinámica",
+          "minutes": 8,
+          "persona": "Analista vs Auditor",
+          "type": "Demo",
+          "description": "Ejecuta exactamente el mismo SQL con dos roles y compara el resultado.",
+          "keyMessage": "La política vive en el dato: SQL, dashboards y herramientas compatibles reciben el resultado autorizado.",
+          "talkTrack": "El analista ve PAN enmascarado y su país; el auditor autorizado ve el valor completo. Nadie mantiene dos copias de la tabla.",
+          "actions": [
+            "Mostrar column mask sobre PAN y email.",
+            "Mostrar row filter por país, filial o propósito.",
+            "Ejecutar la misma consulta para las dos personas.",
+            "Conectar la política con Genie y dashboards."
+          ],
+          "features": ["Column masks", "Row filters", "Dynamic views", "Need to know"]
+        },
+        {
+          "id": "demo-5",
+          "title": "Trazar origen e impacto",
+          "minutes": 6,
+          "persona": "Data Owner / Auditor",
+          "type": "Demo",
+          "description": "Sigue el lineage desde una columna sensible hasta su consumo.",
+          "keyMessage": "Lineage responde de dónde vino el dato y qué se rompe si cambia.",
+          "talkTrack": "Seleccionamos monto o score y seguimos la transformación hasta el dashboard de Riesgo.",
+          "actions": [
+            "Lineage de tabla y columna.",
+            "Mostrar notebooks, jobs o dashboards conectados.",
+            "Mencionar external lineage para movimientos fuera de Databricks."
+          ],
+          "features": ["Table lineage", "Column lineage", "Impact analysis", "External lineage"]
+        },
+        {
+          "id": "demo-6",
+          "title": "Medir confianza y semántica",
+          "minutes": 4,
+          "persona": "Owner / Negocio",
+          "type": "Demo breve",
+          "description": "Conecta calidad, definiciones y KPIs reutilizables.",
+          "keyMessage": "Un dato certificado necesita calidad observable y una definición compartida.",
+          "talkTrack": "La Page define 'transacción internacional'; la Metric View define el KPI; el monitor detecta anomalías.",
+          "actions": [
+            "Mostrar perfil o anomalía si hay monitor preparado.",
+            "Nombrar Metric Views como métricas gobernadas.",
+            "Conectar Pages con el contexto que usa Genie One."
+          ],
+          "features": ["Data quality monitoring", "Metric Views", "Pages", "Business semantics"]
+        },
+        {
+          "id": "demo-7",
+          "title": "Producir evidencia de auditoría",
+          "minutes": 6,
+          "persona": "Administrador / Auditor",
+          "type": "Demo",
+          "description": "Consulta system tables para accesos y cambios de permisos.",
+          "keyMessage": "Gobierno operativo significa poder responder quién hizo qué, cuándo y sobre qué activo.",
+          "talkTrack": "Cerramos la historia con la consulta del analista y el cambio de permisos visibles en audit.",
+          "actions": [
+            "Consultar system.access.audit con filtro temporal.",
+            "Mostrar eventos de SELECT y GRANT/REVOKE disponibles.",
+            "Explicar retención, acceso restringido y alertas."
+          ],
+          "features": ["System tables", "Audit logs", "Access events", "Permission changes"]
+        },
+        {
+          "id": "demo-8",
+          "title": "Extender el mismo gobierno",
+          "minutes": 2,
+          "persona": "Arquitectura",
+          "type": "Callouts",
+          "description": "Cubre capacidades avanzadas sin abrir demos adicionales.",
+          "keyMessage": "El mismo plano se extiende a archivos, fuentes externas, intercambio y activos de IA.",
+          "talkTrack": "Volumes gobierna documentos; Federation incorpora Teradata; Delta Sharing conecta filiales o terceros; Iceberg habilita motores abiertos; modelos y Genie heredan gobierno.",
+          "actions": [
+            "Volumes: documentos y datos no tabulares.",
+            "Lakehouse Federation: acceso gobernado a Teradata sin migrar primero.",
+            "Delta Sharing / Clean Rooms: colaboración sin copias inseguras.",
+            "Iceberg interoperability: motores externos sobre catálogo abierto.",
+            "AI governance: modelos, funciones, agentes y AI Gateway."
+          ],
+          "features": ["Volumes", "Federation", "Delta Sharing", "Clean Rooms", "Iceberg", "AI governance"]
+        }
+      ]
+    },
+    {
+      "id": "diners",
+      "title": "Diseño objetivo para Diners",
+      "subtitle": "De la demo a un modelo operativo",
+      "minutes": 15,
+      "color": "teal",
+      "steps": [
+        {
+          "id": "diners-1",
+          "title": "Coexistencia Teradata + Databricks",
+          "minutes": 5,
+          "persona": "Arquitectura",
+          "type": "Whiteboard",
+          "description": "Ubica Unity Catalog como plano de gobierno durante una transición gradual.",
+          "keyMessage": "Los reportes regulatorios pueden permanecer en Teradata mientras nuevos productos usan Databricks y un gobierno común.",
+          "talkTrack": "Lakehouse Federation habilita consulta; lineage extendido y controles de acceso dan visibilidad mientras se decide workload por workload.",
+          "actions": [
+            "Teradata: reportes SBS, OLAP crítico y scoring legacy.",
+            "Databricks: lakehouse, datos no estructurados, ML/IA y nuevos productos.",
+            "Federación, Delta Sharing e Iceberg como patrones de coexistencia."
+          ],
+          "features": ["Lakehouse Federation", "External lineage", "Delta Sharing", "Iceberg REST Catalog"]
+        },
+        {
+          "id": "diners-2",
+          "title": "Asignar responsabilidades",
+          "minutes": 5,
+          "persona": "Todos",
+          "type": "Discusión",
+          "description": "Completa el mapa de personas con responsables reales de Diners.",
+          "keyMessage": "Cada dominio requiere un owner de negocio, un curator y grupos consumidores; Seguridad define guardrails transversales.",
+          "talkTrack": "¿Quién puede certificar una tabla de Fraude? ¿Quién aprueba el acceso? ¿Quién mantiene la definición del KPI?",
+          "actions": [
+            "Nombrar owner y curator para Tarjetas/Fraude.",
+            "Nombrar owner y curator para Cobranzas/Crédito.",
+            "Identificar grupos consumidores y aprobadores.",
+            "Asignar administración de metastore, identidad y policies."
+          ],
+          "features": ["Ownership", "Data stewardship", "Separation of duties", "MANAGE DISCOVERY"]
+        },
+        {
+          "id": "diners-3",
+          "title": "Priorizar dos pilotos",
+          "minutes": 5,
+          "persona": "Todos",
+          "type": "Decisión",
+          "description": "Define alcance medible para el siguiente laboratorio.",
+          "keyMessage": "Empieza con dos dominios, una taxonomía y una evidencia de auditoría; no con una migración completa.",
+          "talkTrack": "Proponemos Tarjetas/Fraude y Cobranzas/Crédito porque combinan PII, reglas por rol, lineage y valor analítico.",
+          "actions": [
+            "Elegir 3–5 activos por dominio.",
+            "Acordar tags: dominio, sensibilidad, criticidad y certificación.",
+            "Definir una mask, un row filter y una política ABAC.",
+            "Definir criterio de éxito: tiempo para encontrar, acceso aprobado y evidencia generada."
+          ],
+          "features": ["Pilot", "Taxonomy", "Policy design", "Success metrics"]
+        }
+      ]
+    },
+    {
+      "id": "cierre",
+      "title": "Cierre",
+      "subtitle": "Acuerdos y siguiente paso",
+      "minutes": 10,
+      "color": "amber",
+      "steps": [
+        {
+          "id": "cierre-1",
+          "title": "Recapitular la historia",
+          "minutes": 4,
+          "persona": "Todos",
+          "type": "Resumen",
+          "description": "Regresa a la tabla inicial y enumera el resultado de cada persona.",
+          "keyMessage": "Una tabla, una política, un lineage y un audit; distintas experiencias según responsabilidad.",
+          "talkTrack": "El analista encontró y usó; el curator documentó y certificó; el administrador protegió y auditó.",
+          "actions": [
+            "Consumidor: Discover y acceso autorizado.",
+            "Curator: dominio, Page, tags y certificación.",
+            "Administrador: grupos, políticas y audit."
+          ],
+          "features": ["Discover", "Curation", "Enforcement", "Evidence"]
+        },
+        {
+          "id": "cierre-2",
+          "title": "Acordar el próximo laboratorio",
+          "minutes": 6,
+          "persona": "Todos",
+          "type": "Compromiso",
+          "description": "Convierte interés en un plan acotado.",
+          "keyMessage": "El siguiente paso es un lab sobre datos sintéticos o un dominio no productivo, con owners y criterios de éxito.",
+          "talkTrack": "No cerremos con 'les mandamos material'. Cerremos con fecha, responsables y alcance.",
+          "actions": [
+            "Confirmar los dos dominios piloto.",
+            "Confirmar participantes: admin, steward, seguridad y dos consumidores.",
+            "Solicitar mapa de grupos e inventario de 3–5 activos.",
+            "Agendar lab técnico y revisión de arquitectura."
+          ],
+          "features": ["Next steps", "Owners", "Assessment", "Hands-on lab"]
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "label": "Discover data",
+      "url": "https://docs.databricks.com/aws/en/discover/"
+    },
+    {
+      "label": "Data discovery in Unity Catalog",
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/data-discovery"
+    },
+    {
+      "label": "Unity Catalog",
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/"
+    },
+    {
+      "label": "Row filters and column masks",
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks/"
+    },
+    {
+      "label": "Audit log system table",
+      "url": "https://docs.databricks.com/aws/en/admin/system-tables/audit-logs"
+    }
+  ]
+}

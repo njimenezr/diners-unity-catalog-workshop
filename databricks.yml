@@ -1,0 +1,20 @@
+bundle:
+  name: diners-uc-workshop
+
+resources:
+  apps:
+    diners_uc_workshop:
+      name: diners-uc-workshop
+      description: "Workshop de 90 minutos: Unity Catalog y gobierno de datos para Diners"
+      source_code_path: .
+      config:
+        command:
+          - sh
+          - -c
+          - uvicorn main:app --host 0.0.0.0 --port ${DATABRICKS_APP_PORT:-8000}
+
+targets:
+  dev:
+    default: true
+    workspace:
+      host: https://fe-sandbox-serverless-tko-nj.cloud.databricks.com
