@@ -18,3 +18,23 @@ targets:
     default: true
     workspace:
       host: https://fe-sandbox-serverless-tko-nj.cloud.databricks.com
+  demo:
+    workspace:
+      host: https://fevm-serverless-demo-nj.cloud.databricks.com
+    resources:
+      apps:
+        diners_uc_workshop:
+          config:
+            env:
+              - name: WORKSHOP_CATALOG
+                value: serverless_demo_nj_catalog
+              - name: WORKSHOP_DOMAIN_GENERAL
+                value: finance
+              - name: WORKSHOP_DOMAIN_RISK
+                value: finance
+              - name: WORKSHOP_SENSITIVITY_HIGH
+                value: pii
+              - name: WORKSHOP_SENSITIVITY_VALUES
+                value: pii, internal o public
+              - name: WORKSHOP_PII_VALUES
+                value: ssn, email, phone, credit_card, name o address

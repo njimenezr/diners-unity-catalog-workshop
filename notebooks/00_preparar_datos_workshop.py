@@ -20,7 +20,43 @@
 
 # COMMAND ----------
 
-CATALOG = "diners_governance"
+import re
+
+dbutils.widgets.text("catalog", "diners_governance", "Catálogo de destino")
+dbutils.widgets.dropdown("create_catalog", "true", ["true", "false"], "Crear catálogo")
+dbutils.widgets.text("domain_general", "payments", "Tag domain general")
+dbutils.widgets.text("domain_risk", "risk_fraud", "Tag domain de riesgo")
+dbutils.widgets.text("sensitivity_high", "HIGH", "Tag sensitivity alto")
+dbutils.widgets.text("sensitivity_medium", "MEDIUM", "Tag sensitivity medio")
+dbutils.widgets.text("sensitivity_low", "LOW", "Tag sensitivity bajo")
+dbutils.widgets.text("data_product", "true", "Tag data_product")
+dbutils.widgets.text("pii_card", "other", "Tag pii_type para PAN")
+
+CATALOG = dbutils.widgets.get("catalog").strip()
+CREATE_CATALOG = dbutils.widgets.get("create_catalog").lower() == "true"
+DOMAIN_GENERAL = dbutils.widgets.get("domain_general").strip()
+DOMAIN_RISK = dbutils.widgets.get("domain_risk").strip()
+SENSITIVITY_HIGH = dbutils.widgets.get("sensitivity_high").strip()
+SENSITIVITY_MEDIUM = dbutils.widgets.get("sensitivity_medium").strip()
+SENSITIVITY_LOW = dbutils.widgets.get("sensitivity_low").strip()
+DATA_PRODUCT = dbutils.widgets.get("data_product").strip()
+PII_CARD = dbutils.widgets.get("pii_card").strip()
+
+for parameter_name, parameter_value in {
+    "catalog": CATALOG,
+    "domain_general": DOMAIN_GENERAL,
+    "domain_risk": DOMAIN_RISK,
+    "sensitivity_high": SENSITIVITY_HIGH,
+    "sensitivity_medium": SENSITIVITY_MEDIUM,
+    "sensitivity_low": SENSITIVITY_LOW,
+    "data_product": DATA_PRODUCT,
+    "pii_card": PII_CARD,
+}.items():
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", parameter_value):
+        raise ValueError(
+            f"Valor no válido para {parameter_name}: {parameter_value!r}"
+        )
+
 DATA_SCHEMA = "tarjetas"
 GOV_SCHEMA = "governance"
 AUDITOR_GROUP = "admins"  # Grupo local del sandbox. En producción usar un account group.
@@ -39,10 +75,13 @@ print(f"Auditores demo: {AUDITOR_GROUP} | Principal con acceso: {CONSUMER_PRINCI
 
 # COMMAND ----------
 
-spark.sql(f"""
-CREATE CATALOG IF NOT EXISTS {CATALOG}
-COMMENT 'Activos 100% sintéticos para el workshop de gobierno de Diners'
-""")
+if CREATE_CATALOG:
+    spark.sql(f"""
+    CREATE CATALOG IF NOT EXISTS {CATALOG}
+    COMMENT 'Activos 100% sintéticos para el workshop de gobierno de Diners'
+    """)
+else:
+    print(f"Usando catálogo existente: {CATALOG}")
 
 spark.sql(f"""
 CREATE SCHEMA IF NOT EXISTS {CATALOG}.{DATA_SCHEMA}
@@ -156,22 +195,23 @@ print("✓ 200 clientes, 50 comercios y 1.000 transacciones creadas")
 # MAGIC
 # MAGIC El sandbox ya tiene políticas para algunos governed tags. Usamos sus valores permitidos:
 # MAGIC
-# MAGIC - `domain`: `payments` / `risk_fraud`
-# MAGIC - `sensitivity`: `HIGH` / `MEDIUM` / `LOW`
-# MAGIC - `pii_type`: `name`, `email`, `phone`, `other`
+# MAGIC - `domain`: configurable mediante `domain_general` / `domain_risk`
+# MAGIC - `sensitivity`: configurable mediante los widgets `sensitivity_*`
+# MAGIC - `data_product`: configurable mediante el widget del mismo nombre
+# MAGIC - `pii_type` para PAN: configurable mediante `pii_card`
 
 # COMMAND ----------
 
 tag_statements = [
     f"""ALTER TABLE {CATALOG}.{DATA_SCHEMA}.clientes SET TAGS (
-      'domain' = 'payments', 'sensitivity' = 'HIGH',
-      'contains_pii' = 'true', 'data_product' = 'true')""",
+      'domain' = '{DOMAIN_GENERAL}', 'sensitivity' = '{SENSITIVITY_HIGH}',
+      'contains_pii' = 'true', 'data_product' = '{DATA_PRODUCT}')""",
     f"""ALTER TABLE {CATALOG}.{DATA_SCHEMA}.comercios SET TAGS (
-      'domain' = 'payments', 'sensitivity' = 'LOW',
-      'contains_pii' = 'false', 'data_product' = 'true')""",
+      'domain' = '{DOMAIN_GENERAL}', 'sensitivity' = '{SENSITIVITY_LOW}',
+      'contains_pii' = 'false', 'data_product' = '{DATA_PRODUCT}')""",
     f"""ALTER TABLE {CATALOG}.{DATA_SCHEMA}.transacciones_tarjeta SET TAGS (
-      'domain' = 'risk_fraud', 'sensitivity' = 'HIGH',
-      'contains_pii' = 'true', 'data_product' = 'true')""",
+      'domain' = '{DOMAIN_RISK}', 'sensitivity' = '{SENSITIVITY_HIGH}',
+      'contains_pii' = 'true', 'data_product' = '{DATA_PRODUCT}')""",
     f"""ALTER TABLE {CATALOG}.{DATA_SCHEMA}.clientes
       ALTER COLUMN customer_name SET TAGS ('pii_type' = 'name')""",
     f"""ALTER TABLE {CATALOG}.{DATA_SCHEMA}.clientes
@@ -179,7 +219,7 @@ tag_statements = [
     f"""ALTER TABLE {CATALOG}.{DATA_SCHEMA}.clientes
       ALTER COLUMN phone_number SET TAGS ('pii_type' = 'phone')""",
     f"""ALTER TABLE {CATALOG}.{DATA_SCHEMA}.transacciones_tarjeta
-      ALTER COLUMN card_pan SET TAGS ('pii_type' = 'other')""",
+      ALTER COLUMN card_pan SET TAGS ('pii_type' = '{PII_CARD}')""",
     f"""ALTER TABLE {CATALOG}.{DATA_SCHEMA}.transacciones_tarjeta
       ALTER COLUMN customer_email SET TAGS ('pii_type' = 'email')""",
 ]
@@ -346,12 +386,20 @@ AS glossary(term, definition, domain, business_owner)
 
 spark.sql(f"""
 ALTER TABLE {CATALOG}.{GOV_SCHEMA}.dq_results
-SET TAGS ('domain' = 'risk_fraud', 'sensitivity' = 'MEDIUM', 'data_product' = 'true')
+SET TAGS (
+  'domain' = '{DOMAIN_RISK}',
+  'sensitivity' = '{SENSITIVITY_MEDIUM}',
+  'data_product' = '{DATA_PRODUCT}'
+)
 """)
 
 spark.sql(f"""
 ALTER TABLE {CATALOG}.{GOV_SCHEMA}.business_glossary
-SET TAGS ('domain' = 'payments', 'sensitivity' = 'LOW', 'data_product' = 'true')
+SET TAGS (
+  'domain' = '{DOMAIN_GENERAL}',
+  'sensitivity' = '{SENSITIVITY_LOW}',
+  'data_product' = '{DATA_PRODUCT}'
+)
 """)
 
 display(spark.table(f"{CATALOG}.{GOV_SCHEMA}.dq_results"))
@@ -432,11 +480,11 @@ assert checks["clientes"] == 200
 assert checks["comercios"] == 50
 assert checks["dq_checks"] == 5
 
-print("""
+print(f"""
 ✅ PREPARACIÓN COMPLETA
 
 Siguiente:
-1. Catalog Explorer → diners_governance → tarjetas.
+1. Catalog Explorer → {CATALOG} → tarjetas.
 2. Discover → crear/usar Domain “Tarjetas y Fraude”.
 3. Asignar transacciones_riesgo y fraud_kpis al Domain.
 4. Agregar una Page con las definiciones de business_glossary.
@@ -451,52 +499,56 @@ Siguiente:
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC SELECT *
-# MAGIC FROM diners_governance.tarjetas.transacciones_riesgo
-# MAGIC ORDER BY transaction_ts DESC
-# MAGIC LIMIT 20;
+display(spark.sql(f"""
+SELECT *
+FROM {CATALOG}.{DATA_SCHEMA}.transacciones_riesgo
+ORDER BY transaction_ts DESC
+LIMIT 20
+"""))
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC SELECT *
-# MAGIC FROM diners_governance.governance.dq_results
-# MAGIC ORDER BY regulatory_impact, status;
+display(spark.sql(f"""
+SELECT *
+FROM {CATALOG}.{GOV_SCHEMA}.dq_results
+ORDER BY regulatory_impact, status
+"""))
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   event_time,
-# MAGIC   source_table_full_name,
-# MAGIC   target_table_full_name,
-# MAGIC   source_type,
-# MAGIC   target_type,
-# MAGIC   created_by
-# MAGIC FROM system.access.table_lineage
-# MAGIC WHERE event_date >= current_date() - INTERVAL 7 DAYS
-# MAGIC   AND (
-# MAGIC     source_table_full_name LIKE 'diners_governance.%'
-# MAGIC     OR target_table_full_name LIKE 'diners_governance.%'
-# MAGIC   )
-# MAGIC ORDER BY event_time DESC;
+display(spark.sql(f"""
+SELECT
+  event_time,
+  source_table_full_name,
+  target_table_full_name,
+  source_type,
+  target_type,
+  created_by
+FROM system.access.table_lineage
+WHERE event_date >= current_date() - INTERVAL 7 DAYS
+  AND (
+    source_table_full_name LIKE '{CATALOG}.%'
+    OR target_table_full_name LIKE '{CATALOG}.%'
+  )
+ORDER BY event_time DESC
+"""))
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   event_time,
-# MAGIC   user_identity.email AS actor,
-# MAGIC   action_name,
-# MAGIC   service_name,
-# MAGIC   request_params
-# MAGIC FROM system.access.audit
-# MAGIC WHERE event_date >= current_date() - INTERVAL 1 DAY
-# MAGIC   AND (
-# MAGIC     request_params['full_name_arg'] LIKE 'diners_governance.%'
-# MAGIC     OR request_params['name'] LIKE 'diners_governance.%'
-# MAGIC     OR request_params['catalog_name'] = 'diners_governance'
-# MAGIC   )
-# MAGIC ORDER BY event_time DESC
-# MAGIC LIMIT 100;
+display(spark.sql(f"""
+SELECT
+  event_time,
+  user_identity.email AS actor,
+  action_name,
+  service_name,
+  request_params
+FROM system.access.audit
+WHERE event_date >= current_date() - INTERVAL 1 DAY
+  AND (
+    request_params['full_name_arg'] LIKE '{CATALOG}.%'
+    OR request_params['name'] LIKE '{CATALOG}.%'
+    OR request_params['catalog_name'] = '{CATALOG}'
+  )
+ORDER BY event_time DESC
+LIMIT 100
+"""))

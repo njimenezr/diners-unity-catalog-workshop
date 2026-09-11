@@ -1,6 +1,7 @@
 """Diners Unity Catalog Workshop — shareable instruction app."""
 
 import json
+import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -10,9 +11,42 @@ from fastapi.staticfiles import StaticFiles
 ROOT = Path(__file__).parent
 DATA_PATH = ROOT / "data" / "workshop.json"
 FRONTEND_PATH = ROOT / "frontend"
+DEFAULT_CATALOG = "diners_governance"
+WORKSHOP_CATALOG = os.getenv("WORKSHOP_CATALOG", DEFAULT_CATALOG)
+DEFAULT_DOMAIN_GENERAL = "payments"
+DEFAULT_DOMAIN_RISK = "risk_fraud"
+WORKSHOP_DOMAIN_GENERAL = os.getenv(
+    "WORKSHOP_DOMAIN_GENERAL", DEFAULT_DOMAIN_GENERAL
+)
+WORKSHOP_DOMAIN_RISK = os.getenv("WORKSHOP_DOMAIN_RISK", DEFAULT_DOMAIN_RISK)
+WORKSHOP_SENSITIVITY_HIGH = os.getenv("WORKSHOP_SENSITIVITY_HIGH", "HIGH")
+WORKSHOP_SENSITIVITY_VALUES = os.getenv(
+    "WORKSHOP_SENSITIVITY_VALUES", "HIGH, MEDIUM o LOW"
+)
+WORKSHOP_PII_VALUES = os.getenv(
+    "WORKSHOP_PII_VALUES", "name, email, phone u other"
+)
 
 with DATA_PATH.open("r", encoding="utf-8") as source:
-    WORKSHOP = json.load(source)
+    workshop_source = source.read()
+
+workshop_source = workshop_source.replace(DEFAULT_CATALOG, WORKSHOP_CATALOG)
+workshop_source = workshop_source.replace(
+    DEFAULT_DOMAIN_GENERAL, WORKSHOP_DOMAIN_GENERAL
+)
+workshop_source = workshop_source.replace(DEFAULT_DOMAIN_RISK, WORKSHOP_DOMAIN_RISK)
+workshop_source = workshop_source.replace(
+    "sensitivity=HIGH", f"sensitivity={WORKSHOP_SENSITIVITY_HIGH}"
+)
+workshop_source = workshop_source.replace(
+    "`sensitivity` = HIGH, MEDIUM o LOW",
+    f"`sensitivity` = {WORKSHOP_SENSITIVITY_VALUES}",
+)
+workshop_source = workshop_source.replace(
+    "`pii_type` = name, email, phone u other",
+    f"`pii_type` = {WORKSHOP_PII_VALUES}",
+)
+WORKSHOP = json.loads(workshop_source)
 
 SECTIONS_BY_ID = {section["id"]: section for section in WORKSHOP["sections"]}
 

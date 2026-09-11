@@ -71,11 +71,16 @@ Como alternativa reducida, `scripts/01_demo_setup.sql` prepara únicamente la ta
 
 Las funciones de mask revelan valores completos al grupo local `admins` y enmascaran para los demás. Esto permite validar la demo en el sandbox solicitado. Para producción, reemplaza ese grupo por un grupo de cuenta sincronizado desde el IdP y usa `is_account_group_member()`.
 
-El workspace ya aplica políticas a algunos governed tags. El script usa valores permitidos allí:
+El notebook acepta widgets para adaptarse a las políticas del metastore:
 
-- `domain = payments`
-- `sensitivity = HIGH`
-- `pii_type = other | email`
+- `catalog` y `create_catalog`
+- `domain_general` y `domain_risk`
+- `sensitivity_high`, `sensitivity_medium` y `sensitivity_low`
+- `data_product` y `pii_card`
+
+Los defaults del sandbox original son `diners_governance`, `payments` /
+`risk_fraud`, `HIGH` / `MEDIUM` / `LOW`, `data_product=true` y
+`pii_card=other`.
 
 El dominio de negocio visible en Discover puede seguir llamándose **Tarjetas**; el governed tag `domain` utiliza la taxonomía corporativa existente.
 
@@ -91,32 +96,26 @@ Los prompts con DDL indican explícitamente que no deben ejecutar cambios autom�
 
 ## Desplegar en Databricks Apps
 
-Workspace objetivo:
+Targets configurados:
 
-```text
-https://fe-sandbox-serverless-tko-nj.cloud.databricks.com
-```
-
-Perfil CLI:
-
-```text
-fe-sandbox-tko-nj
-```
+- `dev`: `fe-sandbox-serverless-tko-nj.cloud.databricks.com`, perfil
+  `fe-sandbox-tko-nj`.
+- `demo`: `fevm-serverless-demo-nj.cloud.databricks.com`, perfil `fevm-demo`.
 
 Validación y despliegue:
 
 ```bash
 databricks bundle validate -t dev --profile fe-sandbox-tko-nj
-databricks bundle deploy -t dev --profile fe-sandbox-tko-nj
-databricks bundle run diners_uc_workshop -t dev --profile fe-sandbox-tko-nj
-```
-
-También puede usarse el flujo integrado:
-
-```bash
-databricks apps validate --profile fe-sandbox-tko-nj
 databricks apps deploy -t dev --profile fe-sandbox-tko-nj
+
+databricks bundle validate -t demo --profile fevm-demo
+databricks apps deploy -t demo --profile fevm-demo
 ```
+
+El target `demo` sustituye en la app el catálogo por
+`serverless_demo_nj_catalog` y usa los governed tags permitidos por ese
+metastore: `domain=finance`, `sensitivity=pii|internal|public` y
+`pii_type=credit_card` para PAN.
 
 ## Documentación
 
