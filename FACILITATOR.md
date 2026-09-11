@@ -32,7 +32,7 @@ No abras un segundo caso de uso. Los features avanzados son callouts:
 
 Cada paso aplicable sigue la misma secuencia:
 
-1. **Conversar:** conectar la capacidad con una situación de Diners.
+1. **Conversar:** conectar la capacidad con una situación de Banco Pichincha.
 2. **Explicar:** mostrar el concepto y quién lo gobierna.
 3. **Genie Code:** copiar el prompt de la app y dejar que genere la consulta, validación o entregable.
 
@@ -61,7 +61,7 @@ Discovery requiere el último paso manual de curación: Domain, Page, asignació
 - 0–8: contexto y objetos.
 - 8–23: tres niveles + Discovery.
 - 23–65: demo continua.
-- 65–80: diseño objetivo para Diners.
+- 65–80: diseño objetivo para Banco Pichincha.
 - 80–90: cierre y próximo laboratorio.
 
 Si al minuto 55 estás atrasado, omite calidad y Metric Views. No omitas:

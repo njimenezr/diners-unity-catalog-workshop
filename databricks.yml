@@ -5,7 +5,7 @@ resources:
   apps:
     diners_uc_workshop:
       name: diners-uc-workshop
-      description: "Workshop de 90 minutos: Unity Catalog y gobierno de datos para Diners"
+      description: "Workshop de 90 minutos: Unity Catalog y gobierno de datos para Banco Pichincha"
       source_code_path: .
       config:
         command:

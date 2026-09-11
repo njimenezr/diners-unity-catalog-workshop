@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Preparación — Workshop Unity Catalog para Diners
+# MAGIC # Preparación — Workshop Unity Catalog para Banco Pichincha
 # MAGIC
 # MAGIC Ejecuta **Run All** antes del workshop. El notebook crea un entorno sintético e idempotente para mostrar:
 # MAGIC
@@ -11,7 +11,7 @@
 # MAGIC - Resultados de calidad y glosario de negocio.
 # MAGIC - Consultas de verificación para Catalog Explorer, Discover y auditoría.
 # MAGIC
-# MAGIC **No contiene información real de Diners ni números de tarjeta válidos.**
+# MAGIC **No contiene información real de Banco Pichincha ni números de tarjeta válidos.**
 
 # COMMAND ----------
 
@@ -78,7 +78,7 @@ print(f"Auditores demo: {AUDITOR_GROUP} | Principal con acceso: {CONSUMER_PRINCI
 if CREATE_CATALOG:
     spark.sql(f"""
     CREATE CATALOG IF NOT EXISTS {CATALOG}
-    COMMENT 'Activos 100% sintéticos para el workshop de gobierno de Diners'
+    COMMENT 'Activos 100% sintéticos para el workshop de gobierno de Banco Pichincha'
     """)
 else:
     print(f"Usando catálogo existente: {CATALOG}")
@@ -417,7 +417,7 @@ policy_text = """# Política sintética de acceso a transacciones
 - Los analistas consultan únicamente países asignados.
 - PAN y email se muestran enmascarados salvo autorización de auditoría.
 - Todo acceso debe quedar registrado para revisión.
-- Este documento existe solo para el workshop y no representa una política real de Diners.
+- Este documento existe solo para el workshop y no representa una política real de Banco Pichincha.
 """
 
 dbutils.fs.put(

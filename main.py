@@ -1,4 +1,4 @@
-"""Diners Unity Catalog Workshop — shareable instruction app."""
+"""Banco Pichincha Unity Catalog Workshop — shareable instruction app."""
 
 import json
 import os
@@ -51,7 +51,7 @@ WORKSHOP = json.loads(workshop_source)
 SECTIONS_BY_ID = {section["id"]: section for section in WORKSHOP["sections"]}
 
 app = FastAPI(
-    title="Diners — Unity Catalog: Visión de Gobierno",
+    title="Banco Pichincha — Unity Catalog: Visión de Gobierno",
     version="1.0.0",
 )
 

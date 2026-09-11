@@ -1,6 +1,6 @@
 {
   "title": "Unity Catalog: Visión de Gobierno Databricks",
-  "customer": "Diners",
+  "customer": "Banco Pichincha",
   "durationMinutes": 90,
   "language": "Español",
   "audience": "Gobierno de datos, seguridad, arquitectura, datos, riesgo y analítica",
@@ -21,7 +21,7 @@
     {
       "id": "contexto",
       "title": "Contexto y visión",
-      "subtitle": "Por qué gobierno unificado para Diners",
+      "subtitle": "Por qué gobierno unificado para Banco Pichincha",
       "minutes": 8,
       "color": "red",
       "steps": [
@@ -33,7 +33,7 @@
           "type": "Conversación",
           "description": "Conecta el workshop con PII, PCI DSS, trazabilidad regulatoria y coexistencia con Teradata.",
           "keyMessage": "El objetivo no es catalogar por catalogar: es reducir exposición y acelerar el acceso seguro a datos confiables.",
-          "talkTrack": "Diners no necesita mover todo para empezar a gobernar. Unity Catalog puede convertirse en el plano común mientras Teradata conserva reportes y procesos críticos.",
+          "talkTrack": "Banco Pichincha no necesita mover todo para empezar a gobernar. Unity Catalog puede convertirse en el plano común mientras Teradata conserva reportes y procesos críticos.",
           "actions": [
             "Preguntar qué evidencia solicita auditoría con mayor frecuencia.",
             "Confirmar los dominios más relevantes: Tarjetas, Fraude, Cobranzas, Crédito o Comercios.",
@@ -289,14 +289,14 @@
             "AI governance: modelos, funciones, agentes y AI Gateway."
           ],
           "features": ["Volumes", "Federation", "Delta Sharing", "Clean Rooms", "Iceberg", "AI governance"],
-          "geniePrompt": "Diseña una matriz de decisión para Diners que compare: Lakehouse Federation, ingestión a Delta/Iceberg, Delta Sharing y Clean Rooms. Usa criterios de latencia, copia de datos, control de acceso, lineage, costo y colaboración externa. Incluye cómo gobernar documentos en Volumes y activos de IA. No asumas que Teradata se elimina.",
+          "geniePrompt": "Diseña una matriz de decisión para Banco Pichincha que compare: Lakehouse Federation, ingestión a Delta/Iceberg, Delta Sharing y Clean Rooms. Usa criterios de latencia, copia de datos, control de acceso, lineage, costo y colaboración externa. Incluye cómo gobernar documentos en Volumes y activos de IA. No asumas que Teradata se elimina.",
           "genieExpected": "Matriz de arquitectura que conserva coexistencia y explica cuándo usar cada patrón."
         }
       ]
     },
     {
       "id": "diners",
-      "title": "Diseño objetivo para Diners",
+      "title": "Diseño objetivo para Banco Pichincha",
       "subtitle": "De la demo a un modelo operativo",
       "minutes": 15,
       "color": "teal",
@@ -323,7 +323,7 @@
           "minutes": 5,
           "persona": "Todos",
           "type": "Discusión",
-          "description": "Completa el mapa de personas con responsables reales de Diners.",
+          "description": "Completa el mapa de personas con responsables reales de Banco Pichincha.",
           "keyMessage": "Cada dominio requiere un owner de negocio, un curator y grupos consumidores; Seguridad define guardrails transversales.",
           "talkTrack": "¿Quién puede certificar una tabla de Fraude? ¿Quién aprueba el acceso? ¿Quién mantiene la definición del KPI?",
           "actions": [
@@ -334,7 +334,7 @@
           ],
           "features": ["Ownership", "Data stewardship", "Separation of duties", "MANAGE DISCOVERY"],
           "geniePrompt": "Convierte las decisiones de esta conversación en una matriz RACI para los dominios `Tarjetas/Fraude` y `Cobranzas/Crédito`. Roles: business owner, data curator, platform admin, security, auditor y consumidor. Acciones: publicar en Discover, aprobar acceso, certificar, mantener Pages, definir tags, operar calidad y revisar audit. Marca cualquier responsabilidad que todavía necesite un nombre real.",
-          "genieExpected": "RACI listo para completar con nombres de Diners durante la sesión."
+          "genieExpected": "RACI listo para completar con nombres de Banco Pichincha durante la sesión."
         },
         {
           "id": "diners-3",
@@ -352,7 +352,7 @@
             "Definir criterio de éxito: tiempo para encontrar, acceso aprobado y evidencia generada."
           ],
           "features": ["Pilot", "Taxonomy", "Policy design", "Success metrics"],
-          "geniePrompt": "Genera un plan de piloto de 4 semanas para Unity Catalog en Diners con dos dominios: Tarjetas/Fraude y Cobranzas/Crédito. Incluye por semana: entregables, responsables, prerrequisitos, 3–5 activos, governed tags, una mask, un row filter, una política ABAC, publicación en Discover, métricas de adopción y evidencia de audit. Separa must-have de opcional.",
+          "geniePrompt": "Genera un plan de piloto de 4 semanas para Unity Catalog en Banco Pichincha con dos dominios: Tarjetas/Fraude y Cobranzas/Crédito. Incluye por semana: entregables, responsables, prerrequisitos, 3–5 activos, governed tags, una mask, un row filter, una política ABAC, publicación en Discover, métricas de adopción y evidencia de audit. Separa must-have de opcional.",
           "genieExpected": "Plan de cuatro semanas con alcance, owners, controles y criterios de éxito."
         }
       ]

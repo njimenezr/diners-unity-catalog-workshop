@@ -1,4 +1,4 @@
-# Diners — Unity Catalog: Visión de Gobierno
+# Banco Pichincha — Unity Catalog: Visión de Gobierno
 
 Workshop interactivo de 90 minutos para presentar gobierno de datos con Unity Catalog. El recorrido cubre:
 

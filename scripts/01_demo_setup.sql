@@ -1,8 +1,8 @@
--- Diners Unity Catalog Workshop
+-- Banco Pichincha Unity Catalog Workshop
 -- Datos 100% sintéticos. Ejecutar como administrador en un SQL Warehouse.
 
 CREATE CATALOG IF NOT EXISTS diners_governance
-COMMENT 'Activos sintéticos para el workshop de gobierno de Diners';
+COMMENT 'Activos sintéticos para el workshop de gobierno de Banco Pichincha';
 
 CREATE SCHEMA IF NOT EXISTS diners_governance.tarjetas
 COMMENT 'Dominio de tarjetas y transacciones sintéticas';
